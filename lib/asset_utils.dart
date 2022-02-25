@@ -5,3 +5,5 @@ extension AssetsUtil on String {
 }
 
 const String iconGithub = "github.png";
+const String iconLinkedIn = "linkedin.png";
+const String iconChPlay = "chplay.png";
