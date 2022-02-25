@@ -86,7 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildIcon(String image){
     return Image.asset(
-        image.fromAssets(),
+        image.fromAssets()
     );
   }
 
