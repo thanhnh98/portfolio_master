@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:portfolio_master/asset_utils.dart';
 
 void main() {
   runApp(const MyApp());
@@ -35,27 +36,47 @@ class _MyHomePageState extends State<MyHomePage> {
     return Stack(
       children: [
         Container(
-          decoration: BoxDecoration(
-            color: Colors.blueGrey.withOpacity(0.4),
+          decoration: const BoxDecoration(
+            color: Color(0xfffbfaff),
           ),
         ),
-        Row(
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Expanded(
-                child: Container(
-                  child: _buildBody(),
-                )
+            Image.asset(
+              "assets/profile.png",
+              width: 200,
+              height: 200,
             ),
-            Expanded(
-                flex: 1,
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: Image.asset(
-                    "assets/profile.jpg",
-                    fit: BoxFit.fitHeight,
-                    height: double.infinity,
-                  ),
-                )
+            SizedBox(
+              height: 10,
+            ),
+            _buildTitle("@thanhnh98"),
+            _buildContent("Mobile Developer (Kotlin/Java/Flutter)"),
+            SizedBox(
+              height: 16,
+            ),
+            _buildContent(
+                "\"Có làm thì mới có ăn, không làm mà đòi có ăn thì ăn đầu bùi ăn shit <3\"",
+                fontSize: 18,
+                fontStyle: FontStyle.italic
+            ),
+            SizedBox(
+              height: 40,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildIcon(iconGithub),
+                SizedBox(width: 16),
+                _buildIcon(iconGithub),
+                SizedBox(width: 16),
+                _buildIcon(iconGithub),
+                SizedBox(width: 16),
+                _buildIcon(iconGithub)
+              ],
             ),
           ],
         )
@@ -63,11 +84,36 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _buildBody() {
-    return Column(
-      children: [
+  Widget _buildIcon(String image){
+    return Image.asset(
+        image.fromAssets(),
+    );
+  }
 
-      ],
+  Widget _buildTitle(String title){
+    return RichText(
+      text: TextSpan(
+        text: title,
+        style: GoogleFonts.roboto(
+          fontSize: 40,
+          color: Colors.black,
+          fontWeight: FontWeight.bold
+        )
+      ),
+    );
+  }
+
+  Widget _buildContent(String content, {double fontSize = 20, FontStyle fontStyle = FontStyle.normal}){
+    return RichText(
+      text: TextSpan(
+        text: content,
+        style: GoogleFonts.roboto(
+          fontSize: fontSize,
+          color: Colors.black,
+          fontWeight: FontWeight.normal,
+          fontStyle: fontStyle
+        )
+      ),
     );
   }
 }
