@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:portfolio_master/utils/asset_utils.dart';
+import 'package:portfolio_master/utils/colors.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../constant.dart';
@@ -21,28 +22,33 @@ class _HomeScreenState extends State<HomeScreen>
 
   AnimationController _animationController;
   AnimationController _lottieController;
-  double randomPosition = (Random().nextInt(10) - 10).toDouble() / 10.0;
+  double randomPosition = (Random().nextInt(20) - 10).toDouble() / 10.0;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _lottieController = AnimationController(vsync: this, duration: Duration(milliseconds: 2000))
+      ..addStatusListener((status) {
+        print("$status _lottieController");
+        if (status == AnimationStatus.forward){
+          setState(() {
+            randomPosition = (Random().nextInt(20) - 10).toDouble() / 10.0;
+          });
+        }
+      })..repeat(reverse: true);
+
+    _animationController = AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 450)
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    _animationController = AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 450));
-
-    _lottieController =
-    AnimationController(vsync: this)
-      ..addStatusListener((status) {
-          if (status == AnimationStatus.completed){
-            setState(() {
-              androidLottie = _buildAlignAndroidLottieFile();
-            });
-          }
-      });
-
     return Stack(
       children: [
         Container(
-          color: Colors.blueGrey,
+          color: CommonColor.primaryColor,
         ),
         Row(
           children: [
@@ -63,8 +69,10 @@ class _HomeScreenState extends State<HomeScreen>
   String _imageSelected = null;
 
   Widget _buildIcon(String image, Function action){
-    Color hoverColor = Colors.white.withOpacity(0.6);
     Color defaultColor = Colors.white.withOpacity(0.3);
+    var defaultSize = 32.0;
+
+    Color hoverColor = Colors.white.withOpacity(0.6);
 
     return GestureDetector(
         onTap: (){
@@ -82,17 +90,23 @@ class _HomeScreenState extends State<HomeScreen>
               });
             },
             cursor: SystemMouseCursors.click,
-            child: Container(
-              decoration: BoxDecoration(
-                  color: _imageSelected == image ? hoverColor : defaultColor,
-                  borderRadius: BorderRadius.circular(32)
+            child: AnimatedScale(
+              duration: Duration(
+                milliseconds: 100
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Image.asset(
-                  image.fromAssets(),
-                  width: 32,
-                  height: 32,
+              scale: _imageSelected == image ? 1.1 : 1.0,
+              child: Container(
+                decoration: BoxDecoration(
+                    color: _imageSelected == image ? hoverColor : defaultColor,
+                    borderRadius: BorderRadius.circular(defaultSize)
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Image.asset(
+                    image.fromAssets(),
+                    width: defaultSize,
+                    height: defaultSize,
+                  ),
                 ),
               ),
             )
@@ -104,10 +118,7 @@ class _HomeScreenState extends State<HomeScreen>
     if (!await launch(url)) throw 'Could not launch $url';
   }
 
-  Widget androidLottie;
-
   Widget _buildTabInfo() {
-    androidLottie = _buildAlignAndroidLottieFile();
     return Container(
       margin: EdgeInsets.all(25),
       child: Column(
@@ -146,7 +157,7 @@ class _HomeScreenState extends State<HomeScreen>
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                buildTextCustom(
+                TextEx(
                     Constant.mine.fullname,
                     size: 52,
                     fontWeight: FontWeight.bold
@@ -154,7 +165,7 @@ class _HomeScreenState extends State<HomeScreen>
                 const SizedBox(
                   height: 10,
                 ),
-                buildTextCustom(
+                TextEx(
                     Constant.mine.title,
                     size: 26
                 ),
@@ -211,20 +222,50 @@ class _HomeScreenState extends State<HomeScreen>
       alignment: Alignment(randomPosition, -1),
       child: Lottie.asset(
         LottieFilesAsset.android,
+        controller: _lottieController
       ),
     );
   }
 
+  var imageEntered = false;
+  var paddingSpace = 0;
+
   Widget _buildTabImage() {
     return  Padding(
       padding: const EdgeInsets.all(25),
-      child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: Image.asset(
-            "assets/profile_full.jpg",
-            fit: BoxFit.cover,
-            width: double.infinity,
+      child: MouseRegion(
+        onEnter: (event){
+          setState(() {
+            imageEntered = true;
+          });
+        },
+        onExit: (event){
+          setState(() {
+            imageEntered = false;
+          });
+        },
+        child: AnimatedScale(
+          duration: Duration(
+              milliseconds: 100
           ),
+          scale: imageEntered? 1.1 : 1.0,
+          child: AnimatedSwitcher(
+            child: _buildImageSwitcher,
+          )
+        )
+      )
+    );
+  }
+
+  Widget _buildImageSwitcher(String imgAssets){
+    return Container(
+      decoration: BoxDecoration(
+
+      ),
+      child: Image.asset(
+        imgLinkedIn.fromAssets(),
+        fit: BoxFit.fitWidth,
+        width: double.infinity,
       ),
     );
   }

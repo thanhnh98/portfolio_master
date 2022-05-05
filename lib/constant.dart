@@ -4,8 +4,8 @@ import 'package:portfolio_master/model/author.dart';
 class Constant{
   static final AuthorModel mine =
   AuthorModel(
-      "Thanh Nguyen",
+      "Thanh Nè",
       "@thanhnh",
-      "Mobile Developer (Kotlin/Java/Flutter)"
+      "Title Siêu To Khổng Lồ Nằm Chính Giữa"
   );
 }
