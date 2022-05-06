@@ -1,7 +1,12 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:get_it/get_it.dart';
 import 'package:lottie/lottie.dart';
+import 'package:portfolio_master/di/get_it.dart';
+import 'package:portfolio_master/model/social.dart';
+import 'package:portfolio_master/store/home/home_store.dart';
 import 'package:portfolio_master/utils/asset_utils.dart';
 import 'package:portfolio_master/utils/colors.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -10,8 +15,7 @@ import '../../constant.dart';
 import '../../utils/styles.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key key}) : super(key: key);
-
+  const HomeScreen({Key? key}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -20,16 +24,19 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen>
     with TickerProviderStateMixin {
 
-  AnimationController _animationController;
-  AnimationController _lottieController;
+  HomeStore _homeStore = getIt<HomeStore>();
+
+  late AnimationController _animationController;
+  late AnimationController _lottieController;
   double randomPosition = (Random().nextInt(20) - 10).toDouble() / 10.0;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    _homeStore.requestWeather();
+
     _lottieController = AnimationController(vsync: this, duration: Duration(milliseconds: 2000))
       ..addStatusListener((status) {
-        print("$status _lottieController");
         if (status == AnimationStatus.forward){
           setState(() {
             randomPosition = (Random().nextInt(20) - 10).toDouble() / 10.0;
@@ -66,9 +73,10 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  String _imageSelected = null;
+  SocialModel? _socialSelected = null;
+  SocialModel? _lastSocialSelected = null;
 
-  Widget _buildIcon(String image, Function action){
+  Widget _buildIcon(SocialModel social){
     Color defaultColor = Colors.white.withOpacity(0.3);
     var defaultSize = 32.0;
 
@@ -76,17 +84,18 @@ class _HomeScreenState extends State<HomeScreen>
 
     return GestureDetector(
         onTap: (){
-          action.call();
+          _launchURL(social.url);
         },
         child: MouseRegion(
             onEnter: (event){
               setState(() {
-                _imageSelected = image;
+                _socialSelected = social;
+                _lastSocialSelected = social;
               });
             },
             onExit: (event){
               setState(() {
-                _imageSelected = null;
+                _socialSelected = null;
               });
             },
             cursor: SystemMouseCursors.click,
@@ -94,16 +103,16 @@ class _HomeScreenState extends State<HomeScreen>
               duration: Duration(
                 milliseconds: 100
               ),
-              scale: _imageSelected == image ? 1.1 : 1.0,
+              scale: _socialSelected == social ? 1.1 : 1.0,
               child: Container(
                 decoration: BoxDecoration(
-                    color: _imageSelected == image ? hoverColor : defaultColor,
+                    color: _socialSelected == social ? hoverColor : defaultColor,
                     borderRadius: BorderRadius.circular(defaultSize)
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Image.asset(
-                    image.fromAssets(),
+                    social.iconAsset,
                     width: defaultSize,
                     height: defaultSize,
                   ),
@@ -119,101 +128,98 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Widget _buildTabInfo() {
-    return Container(
-      margin: EdgeInsets.all(25),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Flexible(
-            flex: 1,
-            child: GestureDetector(
-              onTap: (){
-                if (_animationController.isCompleted) {
-                  _animationController.reverse();
-                } else {
-                  _animationController.forward();
-                }
-              },
-              child: Align(
-                alignment: Alignment.topLeft,
-                child: Container(
-                  child: MouseRegion(
-                    cursor: SystemMouseCursors.click,
-                    child:AnimatedIcon(
-                      icon: AnimatedIcons.menu_close,
-                      progress: _animationController,
-                      color: Colors.white,
-                      size: 32,
+    return Observer(
+        builder: (_) => Container(
+          margin: EdgeInsets.all(25),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Flexible(
+                flex: 1,
+                child: GestureDetector(
+                  onTap: (){
+                    if (_animationController.isCompleted) {
+                      _animationController.reverse();
+                    } else {
+                      _animationController.forward();
+                    }
+                  },
+                  child: Align(
+                    alignment: Alignment.topLeft,
+                    child: Container(
+                      child: MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child:AnimatedIcon(
+                          icon: AnimatedIcons.menu_close,
+                          progress: _animationController,
+                          color: Colors.white,
+                          size: 32,
+                        ),
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ),
-          Flexible(
-            flex: 2,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextEx(
-                    Constant.mine.fullname,
-                    size: 52,
-                    fontWeight: FontWeight.bold
+              Flexible(
+                flex: 2,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextEx(
+                        // _homeStore.weather?.location??"null rồi",
+                        Constant.mine.fullname,
+                        size: 52,
+                        fontWeight: FontWeight.bold
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    TextEx(
+                        Constant.mine.title,
+                        size: 26
+                    ),
+                    const SizedBox(
+                      height: 40,
+                    ),
+                    Flexible(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildIcon(Github),
+                          SizedBox(width: 16),
+                          _buildIcon(LinkedIn),
+                          SizedBox(width: 16),
+                          _buildIcon(CHPlay),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
-                TextEx(
-                    Constant.mine.title,
-                    size: 26
-                ),
-                const SizedBox(
-                  height: 40,
-                ),
-                Flexible(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+              ),
+              Flexible(
+                flex: 1,
+                child: Container(
+                  child: Stack(
                     children: [
-                      _buildIcon(iconGithub,(){
-                        _launchURL("https://github.com/thanhnh98");
-                      }),
-                      SizedBox(width: 16),
-                      _buildIcon(iconLinkedIn,(){
-                        _launchURL("https://www.linkedin.com/in/thanh-nguyen-hoai-512616181/");
-                      }),
-                      SizedBox(width: 16),
-                      _buildIcon(iconChPlay,(){
-                        _launchURL("https://play.google.com/store/apps/dev?id=5540559479839330036");
-                      }),
+                      Align(
+                        alignment: const Alignment(-1,0.24),
+                        child: Container(
+                          width: double.infinity,
+                          height: 1,
+                          color: Colors.white,
+                        ),
+                      ),
+                      _buildAlignAndroidLottieFile()
                     ],
                   ),
                 ),
-              ],
-            ),
+              )
+            ],
           ),
-          Flexible(
-            flex: 1,
-            child: Container(
-              child: Stack(
-                children: [
-                  Align(
-                    alignment: const Alignment(-1,0.24),
-                    child: Container(
-                      width: double.infinity,
-                      height: 1,
-                      color: Colors.white,
-                    ),
-                  ),
-                  _buildAlignAndroidLottieFile()
-                ],
-              ),
-            ),
-          )
-        ],
-      ),
+        )
     );
   }
 
@@ -250,23 +256,58 @@ class _HomeScreenState extends State<HomeScreen>
           ),
           scale: imageEntered? 1.1 : 1.0,
           child: AnimatedSwitcher(
-            child: _buildImageSwitcher,
+            duration: Duration(milliseconds: 300),
+            transitionBuilder: (widget, animation){
+              return ScaleTransition(
+                scale: animation,
+                child: FadeTransition(
+                  opacity: animation,
+                  child: widget,
+                ),
+              );
+            },
+            child: _buildImageSwitcher(_lastSocialSelected),
           )
         )
       )
     );
   }
 
-  Widget _buildImageSwitcher(String imgAssets){
-    return Container(
-      decoration: BoxDecoration(
+  Widget _buildImageSwitcher(SocialModel? social){
+    if (social == null){
+      return Container(
+        key: Key("null"),
+        color: Colors.yellow,
+      );
+    }
 
+    return Container(
+      key: Key(social?.type?.toString()??"null"),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.all(
+          Radius.circular(15)
+        ),
+        color: CommonColor.primaryColor,
+        boxShadow: [
+          BoxShadow(
+            color: CommonColor.primaryColorDark.withOpacity(0.5),
+            spreadRadius: 5,
+            blurRadius: 7,
+            offset: Offset(0, 3), // changes position of shadow
+          ),
+        ],
       ),
-      child: Image.asset(
-        imgLinkedIn.fromAssets(),
-        fit: BoxFit.fitWidth,
-        width: double.infinity,
-      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.all(
+            Radius.circular(15)
+        ),
+        child: FadeInImage.assetNetwork(
+          fit: BoxFit.fitWidth,
+          width: double.infinity,
+          image: social.thumbnailAsset,
+          placeholder: imgPlaceHolder.fromAssets(),
+        ),
+      )
     );
   }
 

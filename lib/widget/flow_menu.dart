@@ -2,18 +2,16 @@ import 'package:flutter/material.dart';
 
 class FlowMenu extends StatefulWidget {
   List<Widget> children;
-  FlowMenu({this.children, Key key}) : super(key: key);
+  FlowMenu({required this.children, Key? key}) : super(key: key);
 
   @override
-  State<FlowMenu> createState() => _FlowMenuState(children: children);
+  State<FlowMenu> createState() => _FlowMenuState();
 }
 
 class _FlowMenuState extends State<FlowMenu> with SingleTickerProviderStateMixin {
 
-  _FlowMenuState({this.children});
 
-  List<Widget> children;
-  AnimationController menuAnimation;
+  late AnimationController menuAnimation;
   IconData lastTapped = Icons.notifications;
 
   @override
@@ -34,13 +32,13 @@ class _FlowMenuState extends State<FlowMenu> with SingleTickerProviderStateMixin
     return Flow(
       delegate: FlowMenuDelegate(menuAnimation: menuAnimation),
       children:
-      children.map<Widget>((Widget widget) => flowMenuItem(widget)).toList(),
+      widget.children.map<Widget>((Widget widget) => flowMenuItem(widget)).toList(),
     );
   }
 }
 
 class FlowMenuDelegate extends FlowDelegate {
-  FlowMenuDelegate({this.menuAnimation})
+  FlowMenuDelegate({required this.menuAnimation})
       : super(repaint: menuAnimation);
 
   final Animation<double> menuAnimation;
@@ -54,7 +52,7 @@ class FlowMenuDelegate extends FlowDelegate {
   void paintChildren(FlowPaintingContext context) {
     double dx = 0.0;
     for (int i = 0; i < context.childCount; ++i) {
-      dx = context.getChildSize(i).width * i;
+      dx = (context.getChildSize(i)?.width??0) * i;
       context.paintChild(
         i,
         transform: Matrix4.translationValues(

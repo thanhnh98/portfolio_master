@@ -1,13 +1,20 @@
 
 import 'package:flutter/material.dart';
+import 'package:portfolio_master/di/get_it.dart';
 import 'package:portfolio_master/ui/home/home_screen.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await setupBefore();
   runApp(const MyApp());
 }
 
+Future setupBefore() async {
+  setup();
+}
+
 class MyApp extends StatelessWidget {
-  const MyApp({Key key}) : super(key: key);
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
