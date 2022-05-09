@@ -168,8 +168,8 @@ class _HomeScreenState extends State<HomeScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     TextEx(
-                        // _homeStore.weather?.location??"null rồi",
-                        Constant.mine.fullname,
+                        _homeStore.weather?.location?.name??"null rồi",
+                        // Constant.mine.fullname,
                         size: 52,
                         fontWeight: FontWeight.bold
                     ),
@@ -282,7 +282,7 @@ class _HomeScreenState extends State<HomeScreen>
     }
 
     return Container(
-      key: Key(social?.type?.toString()??"null"),
+      key: Key(social.type.toString()),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.all(
           Radius.circular(15)

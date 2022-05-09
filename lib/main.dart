@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:portfolio_master/di/get_it.dart';
 import 'package:portfolio_master/ui/home/home_screen.dart';
 
@@ -18,18 +19,23 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        title: 'Bio @thanhnh',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        initialRoute: '/',
-        routes: _buildRoutes()
+    return Observer(
+      name: "global-observer",
+      builder: (BuildContext context) {
+         return MaterialApp(
+             title: 'Bio @thanhnh',
+             theme: ThemeData(
+               primarySwatch: Colors.blue,
+             ),
+             initialRoute: '/',
+             routes: _buildRoutes()
+         );
+      },
     );
   }
 
   Map<String, WidgetBuilder> _buildRoutes() => {
     "/" : (context) => const HomeScreen(),
-    "/info" : (context) => const HomeScreen()
+    // "/info" : (context) => const HomeScreen()
   };
 }

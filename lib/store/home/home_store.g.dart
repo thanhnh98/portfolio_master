@@ -9,27 +9,18 @@ part of 'home_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$HomeStore on _HomeStore, Store {
-  Computed<WeatherModel?>? _$weatherComputed;
+  late final _$weatherAtom = Atom(name: '_HomeStore.weather', context: context);
 
   @override
-  WeatherModel? get weather =>
-      (_$weatherComputed ??= Computed<WeatherModel?>(() => super.weather,
-              name: '_HomeStore.weather'))
-          .value;
-
-  late final _$_weatherAtom =
-      Atom(name: '_HomeStore._weather', context: context);
-
-  @override
-  WeatherModel? get _weather {
-    _$_weatherAtom.reportRead();
-    return super._weather;
+  WeatherModel? get weather {
+    _$weatherAtom.reportRead();
+    return super.weather;
   }
 
   @override
-  set _weather(WeatherModel? value) {
-    _$_weatherAtom.reportWrite(value, super._weather, () {
-      super._weather = value;
+  set weather(WeatherModel? value) {
+    _$weatherAtom.reportWrite(value, super.weather, () {
+      super.weather = value;
     });
   }
 

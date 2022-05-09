@@ -18,10 +18,11 @@ abstract class _HomeStore with Store {
 
   @action
   Future requestWeather() async {
-      _weather = await _fakeWeather();
-  }
-
-  Future<WeatherModel?> _fakeWeather() async {
-    return null;
+    var weatherRes = await _weatherRepository.getWeather();
+    if (weatherRes.statusCode == 200){
+      _weather = WeatherModel.fromJson(weatherRes.data);
+      return;
+    }
+    return;
   }
 }
