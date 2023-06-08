@@ -38,3 +38,11 @@ SocialModel CHPlay = SocialModel(
     SocialType.CHPlay,
     "https://play.google.com/store/apps/dev?id=5540559479839330036"
 );
+
+SocialModel AboutMe = SocialModel(
+    "About Me",
+    iconChPlay.fromAssets(),
+    imgChPlay.fromAssets(),
+    SocialType.CHPlay,
+    "https://play.google.com/store/apps/dev?id=5540559479839330036"
+);

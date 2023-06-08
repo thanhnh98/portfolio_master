@@ -20,7 +20,7 @@ mixin _$HomeStore on _HomeStore, Store {
   @override
   set weather(WeatherModel? value) {
     _$weatherAtom.reportWrite(value, super.weather, () {
-      super.weather = value;
+      this.weather = value;
     });
   }
 

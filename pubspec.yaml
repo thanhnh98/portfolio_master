@@ -42,18 +42,20 @@ dependencies:
   get_it: ^7.2.0
   mobx_codegen: ^2.0.6
   flutter_mobx: ^2.0.5
+  animated_text_kit: ^4.2.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_launcher_icons: ^0.9.2
+  flutter_launcher_icons: ^0.12.0
   build_runner: ^2.1.10
 
 
 flutter_icons:
-  android: "launcher_icon"
-  ios: true
   image_path: "assets/favico.png"
+  web:
+    generate: true
+    image_path: "assets/favico.png"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -87,6 +89,9 @@ flutter:
      - github_thumb.png
      - chplay_thumb.png
      - placeholder.png
+     - img_bg.jpg
+     - img_black_bg.jpg
+     - ic_android.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

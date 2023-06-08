@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
       name: "global-observer",
       builder: (BuildContext context) {
          return MaterialApp(
-             title: 'Bio @thanhnh',
+             title: 'Thanh Nguyen',
              theme: ThemeData(
                primarySwatch: Colors.blue,
              ),
